@@ -8,8 +8,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.superbiz.moviefun.blobstore.Blob;
 import org.superbiz.moviefun.blobstore.BlobStore;
-import org.superbiz.moviefun.blobstore.S3Store;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @SpringBootApplication
 public class Application {
@@ -23,18 +26,23 @@ public class Application {
         return new ServletRegistrationBean(actionServlet, "/moviefun/*");
     }
 
-    @Value("${s3.endpointUrl}") String s3EndpointUrl;
-    @Value("${s3.accessKey}") String s3AccessKey;
-    @Value("${s3.secretKey}") String s3SecretKey;
-    @Value("${s3.bucketName}") String s3BucketName;
-
     @Bean
     public BlobStore blobStore() {
-        AWSCredentials credentials = new BasicAWSCredentials(s3AccessKey, s3SecretKey);
-        AmazonS3Client s3Client = new AmazonS3Client(credentials);
+        return new BlobStore() {
+            @Override
+            public void put(Blob blob) throws IOException {
+                throw new UnsupportedOperationException();
+            }
 
-        s3Client.setEndpoint(s3EndpointUrl);
+            @Override
+            public Optional<Blob> get(String name) throws IOException {
+                throw new UnsupportedOperationException();
+            }
 
-        return new S3Store(s3Client, s3BucketName);
+            @Override
+            public void deleteAll() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 }
